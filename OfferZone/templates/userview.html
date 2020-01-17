@@ -1,0 +1,45 @@
+{% extends 'admin.html' %}
+{% block content %}
+
+
+
+<div class="table-responsive" id="sailorTableArea">
+    <table id="sailorTable" class="table table-striped table-bordered" width="100%">
+ 
+        <thead>
+            <tr>
+                <th>NO</th>
+                <th>PIC</th>
+                <th>CUSTOMER NAME</th>
+                <th>EMAIL</th>
+                <th>MOBILE</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+                {% for user in user %}
+            <tr>
+                <td>{{user.id}}</td>
+                <td><span class="image-block">
+                        <a class="image-zoom" href="/static/pics/{{user.image_file}}" rel="prettyPhoto[gallery]" style="height: 250px;width: 335px;">
+                           <figure>
+                              <img src="/static/pics/{{user.image_file}}" class="img-fluid" alt="" style="height: 50px;width: 50px;">
+                              <figcaption>
+                                 
+                              </figcaption>
+                           </figure>
+                        </a>
+                     </span></td>
+
+                <td>{{user.username}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.phone}}</td>
+                
+             
+            </tr>
+            {% endfor%}
+        </tbody>
+    </table>
+    </div>
+
+    {% endblock %}

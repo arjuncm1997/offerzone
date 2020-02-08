@@ -14,12 +14,19 @@ from flask_mail import Message
 def pindex():
     form1 = LoginForm()
     form2 =RegistrationForm()
-    saved_offers=ret_list=getofferList()
     gallery = Gallery.query.all()
-    return render_template('pindex.html',offers=saved_offers,form1=form1,form2=form2,gal=gallery)
+    return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
 
 
-
+@app.route('/search',methods=['POST','GET'])
+def search():
+    form1 = LoginForm()
+    form2 =RegistrationForm()
+    gallery = Gallery.query.all()
+    if request.method=='POST':
+        search= request.form['search']
+  
+    return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
 
 @app.route('/feedback',methods=['POST','GET'])
 def pindexx():
@@ -36,9 +43,8 @@ def pindexx():
         except:
             return 'not add'  
     else:
-        saved_offers=ret_list=getofferList()
         gallery = Gallery.query.all()
-        return render_template('pindex.html',offers=saved_offers,form1=form1,form2=form2,gal=gallery)
+        return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
 
 
 
@@ -162,7 +168,7 @@ def new_mall():
         if form.image.data:
             profile_pic=save_picture(form.image.data)
             pic=profile_pic
-        mall = Mall(owner=current_user.username,name=form.name.data, desc=form.desc.data, addr1=form.addr1.data,addr2=form.addr2.data,image_file=pic,latitude=form.latitude.data, Logitude =form. Logitude .data)
+        mall = Mall(owner=current_user.username,name=form.name.data, desc=form.desc.data, addr1=form.addr1.data,addr2=form.addr2.data,image_file=pic,latitude=form.latitude.data, place=form.place.data,Logitude =form. Logitude .data)
         db.session.add(mall)
         db.session.commit()
         flash('Mall has been created!', 'success')
@@ -188,6 +194,7 @@ def update_mall(mall_id):
         mall.image_file=pic
         mall.latitude=form.latitude.data
         mall.Logitude =form.Logitude.data
+        mall.place =form.place.data
         db.session.commit()
         flash('Mall has been updated!', 'success')
         return redirect(url_for('new_mall'))
@@ -200,12 +207,13 @@ def update_mall(mall_id):
         form.addr2.data=mall.addr2
         form.latitude.data=mall.latitude
         form. Logitude .data=mall. Logitude 
+        form.place.data = mall.place
     # 'sho' is the backref variable of 'Mall'table..it is using to count no:of shops..
         print(mall.sho)
 
     saved_malls = Mall.query.filter_by(owner=current_user.username).all()
     return render_template('mall.html', title='Update Mall',
-                           form=form,malls=saved_malls,action="modify",mall_id=mall_id,pic=pic)
+                           form=form,malls=saved_malls,action="modify",mall_id=mall_id,pic=pic,mall=mall)
 
 
 @app.route("/mall/<int:mall_id>/delete", methods=['POST'])

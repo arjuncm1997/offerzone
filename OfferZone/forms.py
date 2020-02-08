@@ -60,6 +60,7 @@ class MallRegistrationForm(FlaskForm):
     addr2 = StringField('City', validators=[DataRequired(),Length(min=3, max=99)])
     latitude = StringField('Latitude', validators=[DataRequired(),Length(min=3, max=99)])
     Logitude  = StringField('Logitude', validators=[DataRequired(),Length(min=3, max=99)])
+    place  = StringField('District', validators=[DataRequired(),Length(min=0, max=99)])
 
     #addr3 = StringField('Pin Code', validators=[DataRequired(),Length(min=3, max=99)])
     #phone = StringField('Phone', validators=[DataRequired(),Length(min=5, max=99)])

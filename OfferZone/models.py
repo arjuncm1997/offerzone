@@ -47,6 +47,7 @@ class Mall(db.Model,UserMixin):
     latitude = db.Column(db.String(40))
     Logitude = db.Column(db.String(40))
     image_file = db.Column(db.String(50), nullable=False, default='default.jpg')
+    place = db.Column(db.String(40))
     sho = db.relationship('Shop', backref='malll', lazy=True)
    
     def __repr__(self):

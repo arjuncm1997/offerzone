@@ -19,6 +19,8 @@ def pindex():
     return render_template('pindex.html',offers=saved_offers,form1=form1,form2=form2,gal=gallery)
 
 
+
+
 @app.route('/feedback',methods=['POST','GET'])
 def pindexx():
     if request.method=='POST':
@@ -572,7 +574,8 @@ def getofferList():
                                 "image":url_for('static', filename='pics/' + product.img),
                                 "lat":mall.latitude,
                                 "log":mall.Logitude,
-                                "d":i
+                                "d":i,
+                                "offerid":offer.id
                                 }
                         i=i+1
                         ret_list.append(thisdict)
@@ -1040,3 +1043,23 @@ def changepassword():
     elif request.method == 'GET':
         hashed_password = current_user.password  
     return render_template('changepassword.html', form=form)
+
+@app.route('/offerprofile/<int:id>',methods=['GET','POST'])
+def offerprofile(id):
+    offer=Offer.query.get_or_404(id)
+    product = offer.productid
+    pro = Product.query.get_or_404(product)
+    shop = pro.shopid
+    sho = Shop.query.get_or_404(shop)
+    mall = sho.mallid
+    mal = Mall.query.get_or_404(mall)
+    malll = mal.id
+    print(malll)
+    discount=round(((float(pro.price)-float(offer.price))/float(pro.price))*100)
+    return render_template("offerprofile.html",offer=offer,pro = pro,sho =sho,mal=mal,discount = discount)
+
+
+
+
+
+   

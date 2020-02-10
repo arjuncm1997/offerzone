@@ -25,8 +25,15 @@ def search():
     gallery = Gallery.query.all()
     if request.method=='POST':
         search= request.form['search']
-  
+        sort(search)
+        return redirect('/sort')
     return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
+
+@app.route('/sort')
+def sort(search):
+    saved_offers=retlist=getofferpublic(search)
+    return render_template("sort.html",offers=saved_offers)
+    
 
 @app.route('/feedback',methods=['POST','GET'])
 def pindexx():
@@ -51,7 +58,7 @@ def pindexx():
 @app.route("/home")
 @login_required
 def home():
-    saved_offers=ret_list=getofferList()
+    saved_offers=ret_list=getofferList(search)
     return render_template('home.html',offers=saved_offers)
 
 @app.route("/show_malls")
@@ -210,10 +217,10 @@ def update_mall(mall_id):
         form.place.data = mall.place
     # 'sho' is the backref variable of 'Mall'table..it is using to count no:of shops..
         print(mall.sho)
-
+    place=mall.place
     saved_malls = Mall.query.filter_by(owner=current_user.username).all()
     return render_template('mall.html', title='Update Mall',
-                           form=form,malls=saved_malls,action="modify",mall_id=mall_id,pic=pic,mall=mall)
+                           form=form,malls=saved_malls,action="modify",mall_id=mall_id,place=place,pic=pic,mall=mall)
 
 
 @app.route("/mall/<int:mall_id>/delete", methods=['POST'])
@@ -583,7 +590,8 @@ def getofferList():
                                 "lat":mall.latitude,
                                 "log":mall.Logitude,
                                 "d":i,
-                                "offerid":offer.id
+                                "offerid":offer.id,
+                                "place":mall.place
                                 }
                         i=i+1
                         ret_list.append(thisdict)
@@ -732,7 +740,6 @@ def resettoken(token):
 
 
 @app.route('/admin')
-@login_required
 def admin():
     return render_template("admin.html")
 
@@ -824,6 +831,7 @@ def mallupdate(mall_id):
         mall.image_file=pic
         mall.latitude=form.latitude.data
         mall.Logitude =form.Logitude.data
+        mall.place =form.place.data
         db.session.commit()
         flash('Mall has been updated!', 'success')
         return redirect('/mallview')
@@ -836,6 +844,7 @@ def mallupdate(mall_id):
         form.addr2.data=mall.addr2
         form.latitude.data=mall.latitude
         form. Logitude .data=mall. Logitude 
+        form.place.data = mall.place
     return render_template('mallupdate.html', 
                            form=form,action="modify",mall_id=mall_id,pic=pic,mall=mall)
 
@@ -1070,4 +1079,35 @@ def offerprofile(id):
 
 
 
+@app.route("/getofferspublic",methods =['GET','POST'])
+def getofferspublic():
+    retlist=getofferpublic()
+    return json.dumps(retlist)
    
+
+def getofferpublic(search):
+    malls=Mall.query.filter_by(place=search).all()
+    retlist=[]
+    i=0
+    for mall in malls:
+        for shop in mall.sho:
+            for product in shop.pro:
+                    for offer in product.offers:
+                        discount_per=round(((float(product.price)-float(offer.price))/float(product.price))*100)
+                        thisdict = {
+                                "product": product.name,
+                                "mall": mall.name,
+                                "shop": shop.name,
+                                "old_price":product.price,
+                                "new_price":offer.price,
+                                "offer_per":int(discount_per),
+                                "image":url_for('static', filename='pics/' + product.img),
+                                "lat":mall.latitude,
+                                "log":mall.Logitude,
+                                "d":i,
+                                "offerid":offer.id,
+                                "place":mall.place
+                                }
+                        i=i+1
+                        retlist.append(thisdict)
+    return retlist

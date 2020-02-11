@@ -127,3 +127,8 @@ class Contact(db.Model):
     name = db.Column(db.String)
     email = db.Column(db.String(120), unique=True, nullable=False)
     message = db.Column(db.String)
+
+
+class Place(db.Model,UserMixin):
+     id = db.Column(db.Integer,primary_key=True)
+     place = db.Column(db.String(40),unique=False,nullable=False)

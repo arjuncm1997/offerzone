@@ -8,6 +8,7 @@ from OfferZone.forms import RegistrationForm,LoginForm,AccountForm,MallRegistrat
 import json
 from random import randint
 from flask_mail import Message
+import gmplot
 
 @app.route("/")
 @app.route("/pindex")
@@ -15,7 +16,8 @@ def pindex():
     form1 = LoginForm()
     form2 =RegistrationForm()
     gallery = Gallery.query.all()
-    return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
+    saved_offers=ret_list=getofferList()
+    return render_template('pindex.html',offers = saved_offers,form1=form1,form2=form2,gal=gallery)
 
 
 @app.route('/search',methods=['POST','GET'])
@@ -24,15 +26,16 @@ def search():
     form2 =RegistrationForm()
     gallery = Gallery.query.all()
     if request.method=='POST':
-        search= request.form['search']
-        sort(search)
-        return redirect('/sort')
+        place= request.form['search']
+        return redirect(url_for('sort',place=place))
     return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
 
 @app.route('/sort')
-def sort(search):
+def sort():
+    search=request.args.get('place')
+    getofferpublic(search)
     saved_offers=retlist=getofferpublic(search)
-    return render_template("sort.html",offers=saved_offers)
+    return render_template("sort.html",offers=saved_offers,search=search)
     
 
 @app.route('/feedback',methods=['POST','GET'])
@@ -58,7 +61,7 @@ def pindexx():
 @app.route("/home")
 @login_required
 def home():
-    saved_offers=ret_list=getofferList(search)
+    saved_offers=ret_list=getofferList()
     return render_template('home.html',offers=saved_offers)
 
 @app.route("/show_malls")
@@ -1111,3 +1114,14 @@ def getofferpublic(search):
                         i=i+1
                         retlist.append(thisdict)
     return retlist
+
+
+
+@app.route('/playout')
+def playout():
+    gmap1 = gmplot.GoogleMapPlotter(30.3164945, 
+                                78.03219179999999, 13 ) 
+                        
+    gmap1.draw("playout.html") 
+    return render_template("playout.html")
+

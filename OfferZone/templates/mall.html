@@ -70,34 +70,8 @@
                                 {{ form.addr2(class="form-control form-control-lg") }}
                             {% endif %}
                         </div>
-                        <div class="form-group">
-                            {{ form.latitude.label(class="form-control-label") }}
-                            {% if form.latitude.errors %}
-                                {{ form.latitude(class="form-control form-control-lg is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.latitude.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.latitude(class="form-control form-control-lg") }}
-                            {% endif %}
-                        </div>
  
                     
-                        <div class="form-group">
-                            {{ form.Logitude.label(class="form-control-label") }}
-                            {% if form.Logitude.errors %}
-                                {{ form.Logitude(class="form-control form-control-lg is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.Logitude.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.Logitude(class="form-control form-control-lg") }}
-                            {% endif %}
-                        </div>
                         <div class="form-group">
                             {{ form.place.label(class="form-control-label") }}
                             {% if form.place.errors %}

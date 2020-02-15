@@ -17,6 +17,10 @@ class RegistrationForm(FlaskForm):
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
+    def validate_email(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('That username is taken. Please choose a different one.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -58,9 +62,7 @@ class MallRegistrationForm(FlaskForm):
     addr1 = StringField('Address', validators=[DataRequired(),Length(min=5, max=99)])
     image = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     addr2 = StringField('City', validators=[DataRequired(),Length(min=3, max=99)])
-    latitude = StringField('Latitude', validators=[DataRequired(),Length(min=3, max=99)])
-    Logitude  = StringField('Logitude', validators=[DataRequired(),Length(min=3, max=99)])
-    place  = StringField('District', validators=[DataRequired()])
+    place  = StringField('District')
 
     #addr3 = StringField('Pin Code', validators=[DataRequired(),Length(min=3, max=99)])
     #phone = StringField('Phone', validators=[DataRequired(),Length(min=5, max=99)])
@@ -85,7 +87,7 @@ class ShopRegistrationForm(FlaskForm):
 
             picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 
-            def get_all_malls():
+            def get_all_malls(): 
                 return Mall.query  
 
             mall=QuerySelectField(query_factory=get_all_malls, allow_blank=False,get_label="name")
@@ -169,3 +171,11 @@ class Changepassword(FlaskForm):
     confirm_password = PasswordField('Confirm New Password',
                                      validators=[ EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+
+
+
+class Contactform(FlaskForm):
+    message = TextAreaField('Message',
+                           validators=[DataRequired(), Length(min=2, max=20)])
+    submit = SubmitField('Submit')

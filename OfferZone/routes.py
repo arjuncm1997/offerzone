@@ -4,7 +4,7 @@ from OfferZone import app,db, bcrypt, mail
 from flask_login import login_user, current_user, logout_user, login_required
 from OfferZone.models import User,Mall,Shop,Product,Offer,Gallery, Contact
 from PIL import Image
-from OfferZone.forms import RegistrationForm,LoginForm,AccountForm,MallRegistrationForm,ShopRegistrationForm,ProductRegistrationForm,OfferRegistrationForm,RequestResetForm,ResetPasswordForm, Imageadd, Changepassword
+from OfferZone.forms import Contactform,RegistrationForm,LoginForm,AccountForm,MallRegistrationForm,ShopRegistrationForm,ProductRegistrationForm,OfferRegistrationForm,RequestResetForm,ResetPasswordForm, Imageadd, Changepassword
 import json
 from random import randint
 from flask_mail import Message
@@ -44,7 +44,7 @@ def pindexx():
         name= request.form['name']
         email= request.form['email']
         message= request. form['message']
-        new1 = Contact(name=name,email=email,message=message)
+        new1 = Contact(name=name,email=email,message=message,usertype='public')
         try:
             db.session.add(new1)
             db.session.commit()
@@ -178,7 +178,7 @@ def new_mall():
         if form.image.data:
             profile_pic=save_picture(form.image.data)
             pic=profile_pic
-        mall = Mall(owner=current_user.username,name=form.name.data, desc=form.desc.data, addr1=form.addr1.data,addr2=form.addr2.data,image_file=pic,latitude=form.latitude.data, place=form.place.data,Logitude =form. Logitude .data)
+        mall = Mall(owner=current_user.username,name=form.name.data, desc=form.desc.data, addr1=form.addr1.data,addr2=form.addr2.data,image_file=pic, place=form.place.data)
         db.session.add(mall)
         db.session.commit()
         flash('Mall has been created!', 'success')
@@ -1022,11 +1022,19 @@ def deleteoffer(offer_id):
     return redirect('/offerview')
 
 
-@app.route('/feedbackview')
+@app.route('/ufeedbackview')
 @login_required
-def feedbackview():
-    feedback=Contact.query.all()
-    return render_template('feedback.html',feedback=feedback)
+def ufeedbackview():
+    feedback=Contact.query.filter_by(usertype='user').all()
+    return render_template('ufeedback.html',feedback=feedback)
+
+
+@app.route('/pfeedbackview')
+@login_required
+def pfeedbackview():
+    feedback=Contact.query.filter_by(usertype='public').all()
+    return render_template('pfeedback.html',feedback=feedback)
+
 
 @app.route("/adminaccount", methods=['GET', 'POST'])
 @login_required
@@ -1086,7 +1094,16 @@ def offerprofile(id):
 def getofferspublic():
     retlist=getofferpublic()
     return json.dumps(retlist)
-   
+
+
+@app.route("/getoffersget",methods =['GET','POST'])
+def getffersget():
+    if request.method == 'POST':
+        search= request.form['search']
+    getofferpublic(search)
+    saved_offers=retlist=getofferpublic(search)         
+    return json.dumps(saved_offers)
+
 
 def getofferpublic(search):
     malls=Mall.query.filter_by(place=search).all()
@@ -1125,3 +1142,13 @@ def playout():
     gmap1.draw("playout.html") 
     return render_template("playout.html")
 
+
+@app.route('/ucontact',methods =['GET','POST'])
+def ucontact():
+    form=Contactform()
+    if form.validate_on_submit():
+        contact = Contact(name=current_user.username,email=current_user.email,message=form.message.data,usertype='user')
+        db.session.add(contact)
+        db.session.commit()
+        return redirect('/home')
+    return render_template("ucontact.html",form=form)

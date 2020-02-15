@@ -125,8 +125,9 @@ class Gallery(db.Model):
 class Contact(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    message = db.Column(db.String)
+    email = db.Column(db.String(120))
+    message = db.Column(db.String(120))
+    usertype = db.Column(db.String(120))
 
 
 class Place(db.Model,UserMixin):

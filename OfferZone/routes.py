@@ -202,8 +202,6 @@ def update_mall(mall_id):
         mall.addr1=form.addr1.data
         mall.addr2=form.addr2.data
         mall.image_file=pic
-        mall.latitude=form.latitude.data
-        mall.Logitude =form.Logitude.data
         mall.place =form.place.data
         db.session.commit()
         flash('Mall has been updated!', 'success')
@@ -215,8 +213,6 @@ def update_mall(mall_id):
         form.addr1.data=mall.addr1
         pic= url_for('static', filename='pics/'+mall.image_file)
         form.addr2.data=mall.addr2
-        form.latitude.data=mall.latitude
-        form. Logitude .data=mall. Logitude 
         form.place.data = mall.place
     # 'sho' is the backref variable of 'Mall'table..it is using to count no:of shops..
         print(mall.sho)
@@ -832,8 +828,6 @@ def mallupdate(mall_id):
         mall.addr1=form.addr1.data
         mall.addr2=form.addr2.data
         mall.image_file=pic
-        mall.latitude=form.latitude.data
-        mall.Logitude =form.Logitude.data
         mall.place =form.place.data
         db.session.commit()
         flash('Mall has been updated!', 'success')
@@ -845,8 +839,6 @@ def mallupdate(mall_id):
         form.addr1.data=mall.addr1
         pic= url_for('static', filename='pics/'+mall.image_file)
         form.addr2.data=mall.addr2
-        form.latitude.data=mall.latitude
-        form. Logitude .data=mall. Logitude 
         form.place.data = mall.place
     return render_template('mallupdate.html', 
                            form=form,action="modify",mall_id=mall_id,pic=pic,mall=mall)

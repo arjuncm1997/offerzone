@@ -59,19 +59,6 @@
                         </div>
 
                         <div class="form-group">
-                            {{ form.addr.label(class="form-control-label") }}
-                            {% if form.addr.errors %}
-                                {{ form.addr(class="form-control form-control-lg is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.addr.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.addr(class="form-control form-control-lg") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
                             {{ form.phoneno.label(class="form-control-label") }}
                             {% if form.phoneno.errors %}
                                 {{ form.phoneno(class="form-control form-control-lg is-invalid") }}

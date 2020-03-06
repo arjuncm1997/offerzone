@@ -81,18 +81,17 @@ class ShopRegistrationForm(FlaskForm):
            
             name = StringField('Name',
                                 validators=[DataRequired(), Length(min=2, max=40)])
-            addr = StringField('Address', validators=[DataRequired(),Length(min=0, max=300)])
             phoneno = StringField('Phone:', validators=[DataRequired(),Length(min=0, max=99)])
             desc = StringField('Description',validators=[DataRequired(),Length(min=0, max=199)])
 
             picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 
             def get_all_malls(): 
-                return Mall.query  
+                return Mall.query.filter_by(status='approved').all()
 
             mall=QuerySelectField(query_factory=get_all_malls, allow_blank=False,get_label="name")
             category = SelectField('Category', choices = [('1', 'Jewels'), 
-                ('2', 'Textails'),('3', 'Super Market'),('4', 'Food')],validators=[DataRequired()])
+                ('2', 'Textiles'),('3', 'Super Market'),('4', 'Food')],validators=[DataRequired()])
 
             submit = SubmitField('Save')
 
@@ -121,8 +120,6 @@ class ProductRegistrationForm(FlaskForm):
 class OfferRegistrationForm(FlaskForm):
             name = StringField('Name',
                                     validators=[DataRequired(), Length(min=5, max=40)])
-
-            price =  StringField(' Price:', validators=[DataRequired(),Length(min=0, max=99)])
            
             
             desc = StringField('Description',
@@ -132,7 +129,7 @@ class OfferRegistrationForm(FlaskForm):
                                         validators=[DataRequired(),Length(min=0, max=199)])
 
             def get_all_products():
-                return Product.query
+                return Product.query.filter_by(owner1=current_user.username).all()
 
             product=QuerySelectField(query_factory=get_all_products, allow_blank=False,get_label="name")
 
@@ -177,5 +174,5 @@ class Changepassword(FlaskForm):
 
 class Contactform(FlaskForm):
     message = TextAreaField('Message',
-                           validators=[DataRequired(), Length(min=2, max=20)])
+                           validators=[DataRequired(), Length(min=2, max=200)])
     submit = SubmitField('Submit')

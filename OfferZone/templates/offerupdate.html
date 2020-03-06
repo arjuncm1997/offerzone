@@ -4,7 +4,7 @@
     <div class="col-md-8">
             <div class="content-section">
                     <div class="media">
-                            <img class="rounded-circle account-img" src="{{pic}}">
+                            <img class="rounded-circle account-img" src="{{pic}}" style="width: 300px;height: 150px;">
                             <div class="media-body">
                               
                              
@@ -28,19 +28,6 @@
                                     </div>
                                 {% else %}
                                     {{ form.name(class="form-control form-control-lg") }}
-                                {% endif %}
-                            </div>
-                            <div class="form-group">
-                                {{ form.price.label(class="form-control-label") }}
-                                {% if form.price.errors %}
-                                    {{ form.price(class="form-control form-control-lg is-invalid") }}
-                                    <div class="invalid-feedback">
-                                        {% for error in form.price.errors %}
-                                            <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    {{ form.price(class="form-control form-control-lg") }}
                                 {% endif %}
                             </div>
                             <div class="form-group">

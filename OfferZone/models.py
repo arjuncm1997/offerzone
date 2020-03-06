@@ -34,6 +34,7 @@ class User(db.Model,UserMixin):
 
 class Mall(db.Model,UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    ownerid = db.Column(db.String)
     owner = db.Column(db.String)
     name = db.Column(db.String(40), unique=False, nullable=False)
     desc = db.Column(db.String(200))
@@ -48,6 +49,7 @@ class Mall(db.Model,UserMixin):
     Logitude = db.Column(db.String(40))
     image_file = db.Column(db.String(50), nullable=False, default='default.jpg')
     place = db.Column(db.String)
+    status = db.Column(db.String(40))
     sho = db.relationship('Shop', backref='malll', lazy=True)
    
     def __repr__(self):
@@ -58,7 +60,6 @@ class Shop(db.Model,UserMixin):
         id = db.Column(db.Integer, primary_key=True)
         owner = db.Column(db.String)
         name = db.Column(db.String(40), unique=False, nullable=False)
-        addr = db.Column(db.String(100))
         phoneno=db.Column(db.String(25))
         desc = db.Column(db.String(200))
         image = db.Column(db.String(20), nullable=False, default='default.jpg')

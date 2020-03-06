@@ -20,6 +20,7 @@ def pindex():
     return render_template('pindex.html',offers = saved_offers,form1=form1,form2=form2,gal=gallery)
 
 
+
 @app.route('/search',methods=['POST','GET'])
 def search():
     form1 = LoginForm()
@@ -47,6 +48,7 @@ def pindexx():
         new1 = Contact(name=name,email=email,message=message,usertype='public')
         try:
             db.session.add(new1)
+            publiccontactmail(email)
             db.session.commit()
             return redirect('/')
 
@@ -57,6 +59,12 @@ def pindexx():
         return render_template('pindex.html',form1=form1,form2=form2,gal=gallery)
 
 
+def publiccontactmail(email):
+    log = 'zoneoffer0@gmail.com'
+    msg = Message('New Feedback',
+                  recipients=[log])
+    msg.body = f''' New Feedback received from {email} '''
+    mail.send(msg) 
 
 @app.route("/home")
 @login_required
@@ -94,7 +102,9 @@ def register():
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect('/')
-    return render_template('pindex.html',title='Register', form1=form1,form2=form2)
+    else:
+        flash('Registeration Unsuccessful..!!!!', 'danger')
+        return render_template('pindex.html',title='Register', form1=form1,form2=form2)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -178,7 +188,7 @@ def new_mall():
         if form.image.data:
             profile_pic=save_picture(form.image.data)
             pic=profile_pic
-        mall = Mall(owner=current_user.username,name=form.name.data, desc=form.desc.data, addr1=form.addr1.data,addr2=form.addr2.data,image_file=pic, place=form.place.data)
+        mall = Mall(ownerid=current_user.id,owner=current_user.username,name=form.name.data, desc=form.desc.data, addr1=form.addr1.data,addr2=form.addr2.data,image_file=pic, place=form.place.data,status='')
         db.session.add(mall)
         db.session.commit()
         flash('Mall has been created!', 'success')
@@ -250,7 +260,7 @@ def new_shop():
 
             selected_mall = Mall.query.get_or_404(str(mall_id))
 
-            shop = Shop(owner=current_user.username,name=form.name.data, addr=form.addr.data, phoneno=form.phoneno.data,
+            shop = Shop(owner=current_user.username,name=form.name.data, phoneno=form.phoneno.data,
             desc=form.desc.data,category=form.category.data,malll=selected_mall,image=view)
 
             db.session.add(shop)
@@ -260,7 +270,6 @@ def new_shop():
             
 
             form.name.data = ""
-            form.addr.data = ""
             form.phoneno.data = ""
             form.desc.data = ""
 
@@ -282,7 +291,6 @@ def update_shop(shop_id):
                view= picture_file
 
         shop.name = form.name.data
-        shop.addr=form.addr.data
         shop.phoneno=form.phoneno.data
         shop.desc=form.desc.data
         shop.image=view
@@ -301,7 +309,6 @@ def update_shop(shop_id):
     elif request.method == 'GET':
         
         form.name.data = shop.name
-        form.addr.data= shop.addr
         form.phoneno.data=shop.phoneno
         form.desc.data=shop.desc
         form.category.data=shop.category
@@ -433,9 +440,35 @@ def pro(k):
 
 @app.route("/new_offers")
 def new_offers():
-    saved_offers=ret_list=getofferList()
+    saved_offers=ret_list=getnewofferList()
     return render_template('new_offers.html',offers=saved_offers)
 
+def getnewofferList():
+    malls=Mall.query.filter_by(ownerid=current_user.id).all()
+    ret_list=[]
+    i=0
+    for mall in malls:
+        for shop in mall.sho:
+            for product in shop.pro:
+                    for offer in product.offers:
+                        discount_per=round(((float(product.price)-float(offer.price))/float(product.price))*100)
+                        thisdict = {
+                                "product": product.name,
+                                "mall": mall.name,
+                                "shop": shop.name,
+                                "old_price":product.price,
+                                "new_price":offer.price,
+                                "offer_per":int(discount_per),
+                                "image":url_for('static', filename='pics/' + product.img),
+                                "lat":mall.latitude,
+                                "log":mall.Logitude,
+                                "d":i,
+                                "offerid":offer.id,
+                                "place":mall.place
+                                }
+                        i=i+1
+                        ret_list.append(thisdict)
+    return ret_list
 
 @app.route("/new_off")
 def new_off():
@@ -456,7 +489,7 @@ def new_offer():
         selected_product = Product.query.get_or_404(str(product_id))
         
         dis=(Product.price-500)/5
-        offer = Offer(owner=current_user.username,name=form.name.data, price=form.price.data, desc=form.desc.data, product=selected_product,dis=form.dis.data,image=model )
+        offer = Offer(owner=current_user.username,name=form.name.data, price=selected_product.price, desc=form.desc.data, product=selected_product,dis=form.dis.data,image=model )
         
         db.session.add(offer)
         db.session.commit()
@@ -477,7 +510,6 @@ def update_offer(offer_id):
             profile=save_picture(form.pic.data)
             model=profile
         offer.name = form.name.data
-        offer.price=form.price.data
         offer.desc=form.desc.data
         offer.dis=form.dis.data
         offer.image=model
@@ -487,7 +519,6 @@ def update_offer(offer_id):
     elif request.method == 'GET':
         
         form.name.data = offer.name
-        form.price.data= offer.price
         form.desc.data=offer.desc
         form.dis.data=offer.dis
         model= url_for('static', filename='pics/'+offer.image)
@@ -808,8 +839,34 @@ def userview():
 @app.route('/mallview')
 @login_required
 def mallview():
-    mall= Mall.query.all()
+    mall= Mall.query.filter_by(status='').all()
     return render_template('mallview.html',mall=mall)
+
+@app.route('/mallview1')
+@login_required
+def mallview1():
+    mall= Mall.query.filter_by(status='approved').all()
+    return render_template('mallview1.html',mall=mall)
+
+@app.route('/mallapprove/<int:id>')
+def mallapprove(id):
+    mall = Mall.query.get_or_404(id)
+    email = mall.ownerid
+    mall.status = 'approved'
+    approvemail(id)
+    db.session.commit()
+    return redirect('/mallview')
+
+
+def approvemail(id):
+    mall = Mall.query.get_or_404(id)
+    email = mall.ownerid
+    log = User.query.get_or_404(email)
+    msg = Message('Approved',
+                  recipients=[log.email])
+    msg.body = f''' Your {mall.name} Mall has been approved ..'''
+    mail.send(msg) 
+
 
 @app.route('/mallupdate/<int:mall_id>',methods=['POST','GET'])
 @login_required
@@ -874,7 +931,6 @@ def shopupdate(shop_id):
                view= picture_file
 
         shop.name = form.name.data
-        shop.addr=form.addr.data
         shop.phoneno=form.phoneno.data
         shop.desc=form.desc.data
         shop.image=view
@@ -893,7 +949,6 @@ def shopupdate(shop_id):
     elif request.method == 'GET':
         
         form.name.data = shop.name
-        form.addr.data= shop.addr
         form.phoneno.data=shop.phoneno
         form.desc.data=shop.desc
         form.category.data=shop.category
@@ -986,7 +1041,6 @@ def updateoffer(offer_id):
             profile=save_picture(form.pic.data)
             model=profile
         offer.name = form.name.data
-        offer.price=form.price.data
         offer.desc=form.desc.data
         offer.dis=form.dis.data
         offer.image=model
@@ -996,7 +1050,6 @@ def updateoffer(offer_id):
     elif request.method == 'GET':
         
         form.name.data = offer.name
-        form.price.data= offer.price
         form.desc.data=offer.desc
         form.dis.data=offer.dis
         model= url_for('static', filename='pics/'+offer.image)
@@ -1139,8 +1192,17 @@ def playout():
 def ucontact():
     form=Contactform()
     if form.validate_on_submit():
+        mail=current_user.email
         contact = Contact(name=current_user.username,email=current_user.email,message=form.message.data,usertype='user')
         db.session.add(contact)
+        contactmail()
         db.session.commit()
         return redirect('/home')
     return render_template("ucontact.html",form=form)
+
+def contactmail():
+    log = 'zoneoffer0@gmail.com'
+    msg = Message('New Feedback',
+                  recipients=[log])
+    msg.body = f''' New Feedback received from {current_user.email} '''
+    mail.send(msg) 

@@ -84,6 +84,7 @@ def show_shops():
     saved_shop=Shop.query.all()
     return render_template("showshops.html",shops=saved_shop)
 @app.route("/show_offers")
+@login_required
 def show_offers():
     saved_offer=Offer.query.all()
     return render_template("showoffers.html",saved_offer=Offers)
@@ -137,6 +138,7 @@ def logout():
     return redirect('/')
 
 @app.route("/account", methods=['GET', 'POST'])
+@login_required
 def account():
     form=AccountForm()
     if form.validate_on_submit():
@@ -181,6 +183,7 @@ def save_picture(form_picture):
     return picture_fn
 
 @app.route("/mall/new", methods=['GET', 'POST'])
+@login_required
 def new_mall():
     form=MallRegistrationForm()
     pic=""
@@ -197,6 +200,7 @@ def new_mall():
     return render_template('mall.html', title='New Mall',form=form,malls=saved_malls,pic=pic)
 
 @app.route("/mall/<int:mall_id>/update", methods=['GET', 'POST'])
+@login_required
 def update_mall(mall_id):
     mall = Mall.query.get_or_404(mall_id)
     form = MallRegistrationForm()
@@ -244,6 +248,7 @@ def delete_mall(mall_id):
 
 
 @app.route("/shop/new", methods=['GET', 'POST'])
+@login_required
 def new_shop():
     form=ShopRegistrationForm()
     view="default.jpg"
@@ -279,6 +284,7 @@ def new_shop():
 
 
 @app.route("/shop/<int:shop_id>/update", methods=['GET', 'POST'])
+@login_required
 def update_shop(shop_id):
     shop = Shop.query.get_or_404(shop_id)
     form = ShopRegistrationForm()
@@ -343,6 +349,7 @@ def index(o):
     
 
 @app.route("/product/new",methods = ['GET','POST'])
+@login_required
 def new_product():
     form=ProductRegistrationForm()
     view="default.jpg"
@@ -376,6 +383,7 @@ def new_product():
 
     
 @app.route("/product/<int:product_id>/update", methods=['GET', 'POST'])
+@login_required
 def update_product(product_id):
     product = Product.query.get_or_404(product_id)
     form = ProductRegistrationForm()
@@ -439,6 +447,7 @@ def pro(k):
 
 
 @app.route("/new_offers")
+@login_required
 def new_offers():
     saved_offers=ret_list=getnewofferList()
     return render_template('new_offers.html',offers=saved_offers)
@@ -471,12 +480,14 @@ def getnewofferList():
     return ret_list
 
 @app.route("/new_off")
+@login_required
 def new_off():
     return redirect(url_for('home'))
 
 
 
 @app.route("/offer/new",methods = ['GET','POST'])
+@login_required
 def new_offer():
     form=OfferRegistrationForm()
     model=""
@@ -489,7 +500,8 @@ def new_offer():
         selected_product = Product.query.get_or_404(str(product_id))
         
         dis=(Product.price-500)/5
-        offer = Offer(owner=current_user.username,name=form.name.data, price=selected_product.price, desc=form.desc.data, product=selected_product,dis=form.dis.data,image=model )
+        price = int(selected_product.price)-int(form.dis.data)
+        offer = Offer(owner=current_user.username,name=form.name.data, price=price, desc=form.desc.data, product=selected_product,dis=form.dis.data,image=model )
         
         db.session.add(offer)
         db.session.commit()
@@ -501,6 +513,7 @@ def new_offer():
     return render_template('offer.html',form=form ,title='New Offer',offers=saved_offer,model=model)
 
 @app.route("/offer/<int:offer_id>/update", methods=['GET', 'POST'])
+@login_required
 def update_offer(offer_id):
     offer = Offer.query.get_or_404(offer_id)
     form = OfferRegistrationForm()
@@ -513,6 +526,9 @@ def update_offer(offer_id):
         offer.desc=form.desc.data
         offer.dis=form.dis.data
         offer.image=model
+        product_id=form.product.data
+        selected_product = Product.query.get_or_404(str(product_id))
+        offer.price = int(selected_product.price)-int(form.dis.data)
         db.session.commit()
         flash('Offer has been updated!', 'success')
         return redirect(url_for('new_offer'))
@@ -770,6 +786,7 @@ def resettoken(token):
 
 
 @app.route('/admin')
+@login_required
 def admin():
     return render_template("admin.html")
 
@@ -849,6 +866,7 @@ def mallview1():
     return render_template('mallview1.html',mall=mall)
 
 @app.route('/mallapprove/<int:id>')
+@login_required
 def mallapprove(id):
     mall = Mall.query.get_or_404(id)
     email = mall.ownerid
@@ -1118,6 +1136,7 @@ def changepassword():
     return render_template('changepassword.html', form=form)
 
 @app.route('/offerprofile/<int:id>',methods=['GET','POST'])
+@login_required
 def offerprofile(id):
     offer=Offer.query.get_or_404(id)
     product = offer.productid
@@ -1189,6 +1208,7 @@ def playout():
 
 
 @app.route('/ucontact',methods =['GET','POST'])
+@login_required
 def ucontact():
     form=Contactform()
     if form.validate_on_submit():

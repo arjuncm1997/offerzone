@@ -471,17 +471,17 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 							<form method="POST" action="/login">
 								{{ form1.hidden_tag() }}
 								<fieldset class="form-group">
-									<div class="form-group">
+									<div class="form-group ">
 										{{ form1.email.label(class="form-control-label") }}
 										{% if form1.email.errors %}
-											{{ form1.email(class="form-control form-control-lg is-invalid") }}
+											{{ form1.email(class="form-control form-control-lg is-invalid ") }}
 											<div class="invalid-feedback">
 												{% for error in form1.email.errors %}
 													<span>{{ error }}</span>
 												{% endfor %}
 											</div>
 										{% else %}
-											{{ form1.email(class="form-control form-control-lg") }}
+											{{ form1.email(class="form-control form-control-lg ") }}
 										{% endif %}
 									</div>
 									<div class="form-group">
@@ -520,3 +520,19 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 </div>
 </body>
 </html>
+
+
+<style>
+	
+.login-right input[type="text"], .login-right input[type="password"], .login-bottom input[type="text"], .login-bottom input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    font-weight: normal;
+    background: none;
+    border: 1px solid #E6E4E4;
+    color: black;
+    outline: none;
+    font-size: 14px;
+    margin: 6px 0 17px 0px;
+}
+</style>

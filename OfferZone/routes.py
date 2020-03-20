@@ -453,7 +453,8 @@ def new_offers():
     return render_template('new_offers.html',offers=saved_offers)
 
 def getnewofferList():
-    malls=Mall.query.filter_by(ownerid=current_user.id).all()
+    malls=Mall.query.all()
+
     ret_list=[]
     i=0
     for mall in malls:
@@ -1136,7 +1137,6 @@ def changepassword():
     return render_template('changepassword.html', form=form)
 
 @app.route('/offerprofile/<int:id>',methods=['GET','POST'])
-@login_required
 def offerprofile(id):
     offer=Offer.query.get_or_404(id)
     product = offer.productid
@@ -1149,9 +1149,6 @@ def offerprofile(id):
     print(malll)
     discount=round(((float(pro.price)-float(offer.price))/float(pro.price))*100)
     return render_template("offerprofile.html",offer=offer,pro = pro,sho =sho,mal=mal,discount = discount)
-
-
-
 
 
 @app.route("/getofferspublic",methods =['GET','POST'])
